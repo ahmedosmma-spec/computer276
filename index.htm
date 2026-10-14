@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مصروفاتي</title>
+<style>
+  
+/* خلي الأرقام بالإنجليزي */
+input,
+.total,
+.expense strong,
+#count {
+  font-variant-numeric: lining-nums;
+  direction: ltr;
+}
+
+input[type="date"],
+input[type="number"] {
+  text-align: right;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #101827;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+.card {
+  background: #1b293d;
+  padding: 18px;
+  border-radius: 15px;
+  margin-bottom: 18px;
+}
+
+.total {
+  text-align: center;
+  font-size: 30px;
+  color: #69e0b1;
+  font-weight: bold;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border-radius: 9px;
+  border: none;
+  font-size: 16px;
+}
+
+input, select {
+  background: #0c1524;
+  color: white;
+  border: 1px solid #35445a;
+}
+
+button {
+  background: #69e0b1;
+  color: #10251e;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.expense {
+  background: #0c1524;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.expense-info {
+  overflow-wrap: anywhere;
+}
+
+.expense small {
+  display: block;
+  color: #a9b7ca;
+  margin-top: 5px;
+}
+
+.expense strong {
+  color: #69e0b1;
+  white-space: nowrap;
+}
+
+.delete {
+  background: #ff7785;
+  padding: 7px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.empty {
+  text-align: center;
+  color: #a9b7ca;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>💰 مصروفاتي</h1>
+  <p style="text-align:center;color:#a9b7ca">
+    اعرف فلوسك راحت فين
+  </p>
+
+  <div class="card">
+    <h2>إجمالي المصروفات</h2>
+    <div class="total" id="total">0 جنيه</div>
+    <p style="text-align:center" id="count">
+      عدد العمليات: 0
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>إضافة مصروف</h2>
+
+    <form id="expenseForm">
+      <label for="name">دفعت في إيه؟</label>
+      <input
+        id="name"
+        type="text"
+        placeholder="مثلاً: سندوتشات"
+        maxlength="80"
+        required
+      >
+
+      <label for="amount">المبلغ بالجنيه</label>
+      <input
+        id="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="مثلاً: 25"
+        required
+      >
+
+      <label for="category">نوع المصروف</label>
+      <select id="category">
+        <option>أكل وشرب</option>
+        <option>مواصلات</option>
+        <option>دراسة</option>
+        <option>ألعاب وترفيه</option>
+        <option>ملابس</option>
+        <option>أخرى</option>
+      </select>
+
+      <label for="date">تاريخ المصروف</label>
+      <input id="date" type="date" required>
+
+      <button type="submit">تسجيل المصروف</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>📋 سجل المصروفات</h2>
+
+    <label for="filter">عرض المصروفات</label>
+    <select id="filter">
+      <option value="all">كل المصروفات</option>
+      <option value="month">الشهر الحالي</option>
+    </select>
+
+    <div id="list"></div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = "masrofaty_data";
+
+const form = document.getElementById("expenseForm");
+const nameInput = document.getElementById("name");
+const amountInput = document.getElementById("amount");
+const categoryInput = document.getElementById("category");
+const dateInput = document.getElementById("date");
+
+let expenses = [];
+
+try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  expenses = saved ? JSON.parse(saved) : [];
+
+  if (!Array.isArray(expenses)) {
+    expenses = [];
+  }
+} catch (error) {
+  expenses = [];
+}
+
+function today() {
+  const d = new Date();
+
+  return d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
+
+dateInput.value = today();
+
+function saveData() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(expenses)
+    );
+    return true;
+  } catch (error) {
+    alert("تعذر حفظ البيانات في المتصفح.");
+    return false;
+  }
+}
+
+function formatMoney(amount) {
+  return Number(amount).toLocaleString("ar-EG", {
+    maximumFractionDigits: 2
+  });
+}
+
+function render() {
+  const list = document.getElementById("list");
+  const filter = document.getElementById("filter").value;
+
+  const currentMonth = today().slice(0, 7);
+
+  const shown = expenses
+    .filter(item =>
+      filter === "all" ||
+      item.date.slice(0, 7) === currentMonth
+    )
+    .slice()
+    .reverse();
+
+  const total = shown.reduce(
+    (sum, item) => sum + Number(item.amount),
+    0
+  );
+
+  document.getElementById("total").textContent =
+    formatMoney(total) + " جنيه";
+
+  document.getElementById("count").textContent =
+    "عدد العمليات: " + shown.length;
+
+  list.replaceChildren();
+
+  if (shown.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "لسه مفيش مصروفات مسجلة.";
+    list.appendChild(empty);
+    return;
+  }
+
+  shown.forEach(item => {
+    const box = document.createElement("div");
+    box.className = "expense";
+
+    const info = document.createElement("div");
+    info.className = "expense-info";
+
+    const name = document.createElement("b");
+    name.textContent = item.name;
+
+    const details = document.createElement("small");
+    details.textContent =
+      item.category + " | " + item.date;
+
+    info.append(name, details);
+
+    const right = document.createElement("div");
+
+    const amount = document.createElement("strong");
+    amount.textContent =
+      formatMoney(item.amount) + " ج.م";
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.textContent = "حذف";
+
+    del.addEventListener("click", () => {
+      if (!confirm("متأكد إنك عايز تحذف المصروف؟")) {
+        return;
+      }
+
+      expenses = expenses.filter(
+        expense => expense.id !== item.id
+      );
+
+      if (saveData()) render();
+    });
+
+    right.append(amount, del);
+    box.append(info, right);
+    list.appendChild(box);
+  });
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const name = nameInput.value.trim();
+  const amount = Number(amountInput.value);
+  const category = categoryInput.value;
+  const date = dateInput.value;
+
+  if (
+    !name ||
+    !Number.isFinite(amount) ||
+    amount <= 0 ||
+    !date
+  ) {
+    alert("راجع بيانات المصروف.");
+    return;
+  }
+
+  const expense = {
+    id: Date.now() + Math.random(),
+    name: name,
+    amount: amount,
+    category: category,
+    date: date
+  };
+
+  expenses.push(expense);
+
+  if (!saveData()) {
+    expenses.pop();
+    return;
+  }
+
+  form.reset();
+  dateInput.value = today();
+
+  render();
+});
+
+document.getElementById("filter")
+  .addEventListener("change", render);
+
+render();
+</script>
+</body>
+</html>
