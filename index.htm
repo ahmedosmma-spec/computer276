@@ -207,7 +207,7 @@ button:active {
         <input id="name" type="text" placeholder="مثلاً: سندوتشات" maxlength="80" required>
         <label for="amount" data-lang="lbl_amount">المبلغ بالجنيه</label>
         <input id="amount" type="number" min="0.01" step="0.01" placeholder="مثلاً: 25" required>
-        <label for="category" data-lang="lbl_cat"        <label for="category" data-lang="lbl_cat">نوع المصروف</label>
+        <label for="category" data-lang="lbl_cat">نوع المصروف</label>
         <select id="category">
           <option value="أكل وشرب">أكل وشرب</option>
           <option value="مواصلات">مواصلات</option>
@@ -216,8 +216,6 @@ button:active {
           <option value="ألعاب وترفيه">ألعاب وترفيه</option>
           <option value="ملابس">ملابس</option>
           <option value="أخرى">أخرى</option>
-        </select>
-option>
         </select>
         <label for="date" data-lang="lbl_date">تاريخ المصروف</label>
         <input id="date" type="date" required>
@@ -234,7 +232,6 @@ option>
       <div id="list"></div>
     </div>
   </div>
-  <!-- صفحة الملف الشخصي (تم تعديلها لتدعم رفع الصورة الشخصية) -->
   <div id="page-profile" class="page">
     <div class="card profile-header">
       <div class="profile-avatar" id="avatarContainer" style="cursor: pointer; overflow: hidden; position: relative;">
@@ -256,7 +253,6 @@ option>
     </div>
   </div>
 
-  <!-- صفحة الإعدادات (تم إضافة زر رفع الخلفية المخصصة هنا) -->
   <div id="page-settings" class="page">
     <h1 data-lang="settings_title">⚙️ الإعدادات</h1>
     <div class="card">
@@ -272,7 +268,6 @@ option>
         </select>
       </div>
       
-      <!-- [مكان البحث]: زر رفع خلفية مخصصة من المعرض -->
       <div class="setting-group">
         <label for="customBgInput" data-lang="lbl_custom_bg">📁 رفع خلفية مخصصة من المعرض:</label>
         <input type="file" id="customBgInput" accept="image/*">
@@ -462,8 +457,11 @@ function applyBackground(val) {
   if (val === 'default') {
     document.body.style.background = '#101827';
     document.body.classList.remove('glass-mode');
+    localStorage.removeItem('masrofaty_custom_bg');
+    localStorage.setItem('masrofaty_bg_type', 'default');
   } else {
     document.body.classList.add('glass-mode');
+    localStorage.setItem('masrofaty_bg_type', 'preset');
     if (val === 'gradient1') document.body.style.background = 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)';
     else if (val === 'gradient2') document.body.style.background = 'linear-gradient(135deg, #12002b, #32004a, #0f0c29)';
     else if (val === 'img1') document.body.style.background = "url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80') center/cover fixed";
@@ -471,27 +469,26 @@ function applyBackground(val) {
   }
 }
 
-// --- [مكان البحث]: كود JavaScript الخاص برفع صورة الملف الشخصي والخلفية المخصصة من المعرض ---
-
-// 1. تغيير الصورة الشخصية من المعرض وحفظها محلياً
 const customAvatarInput = document.getElementById('customAvatarInput');
 const avatarImg = document.getElementById('avatarImg');
 const avatarEmoji = document.getElementById('avatarEmoji');
 
-customAvatarInput.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const base64Image = event.target.result;
-      avatarImg.src = base64Image;
-      avatarImg.style.display = 'block';
-      avatarEmoji.style.display = 'none';
-      localStorage.setItem('masrofaty_avatar', base64Image);
-    };
-    reader.readAsDataURL(file);
-  }
-});
+if (customAvatarInput) {
+  customAvatarInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const base64Image = event.target.result;
+        avatarImg.src = base64Image;
+        avatarImg.style.display = 'block';
+        avatarEmoji.style.display = 'none';
+        localStorage.setItem('masrofaty_avatar', base64Image);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
 
 const savedAvatar = localStorage.getItem('masrofaty_avatar');
 if (savedAvatar) {
@@ -500,22 +497,24 @@ if (savedAvatar) {
   avatarEmoji.style.display = 'none';
 }
 
-// 2. رفع خلفية مخصصة من المعرض وحفظها محلياً
 const customBgInput = document.getElementById('customBgInput');
-customBgInput.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const base64Bg = event.target.result;
-      document.body.classList.add('glass-mode');
-      document.body.style.background = `url('${base64Bg}') center/cover fixed`;
-      localStorage.setItem('masrofaty_custom_bg', base64Bg);
-      saveSettings();
-    };
-    reader.readAsDataURL(file);
-  }
-});
+if (customBgInput) {
+  customBgInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const base64Bg = event.target.result;
+        document.body.classList.add('glass-mode');
+        document.body.style.background = `url('${base64Bg}') center/cover fixed`;
+        localStorage.setItem('masrofaty_custom_bg', base64Bg);
+        localStorage.setItem('masrofaty_bg_type', 'custom');
+        saveSettings();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
 
 const langSelect = document.getElementById('langSelect');
 langSelect.addEventListener('change', (e) => { currentLang = e.target.value; applyLanguage(currentLang); saveSettings(); });
@@ -537,14 +536,23 @@ function saveSettings() {
 function loadSettings() {
   try {
     const saved = localStorage.getItem(SETTINGS_KEY);
+    const bgType = localStorage.getItem('masrofaty_bg_type');
+    const savedCustomBg = localStorage.getItem('masrofaty_custom_bg');
+
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed.bg) { bgSelect.value = parsed.bg; applyBackground(parsed.bg); }
-      if (parsed.lang) { langSelect.value = parsed.lang; currentLang = parsed.lang; applyLanguage(parsed.lang); }
+      if (parsed.lang) { 
+        langSelect.value = parsed.lang; 
+        currentLang = parsed.lang; 
+        applyLanguage(parsed.lang); 
+      }
+      if (parsed.bg && bgType !== 'custom') { 
+        bgSelect.value = parsed.bg; 
+        applyBackground(parsed.bg); 
+      }
     }
-    // استرجاع الخلفية المخصصة من المعرض إن وجدت
-    const savedCustomBg = localStorage.getItem('masrofaty_custom_bg');
-    if (savedCustomBg && bgSelect.value.startsWith('img')) {
+
+    if (bgType === 'custom' && savedCustomBg) {
       document.body.classList.add('glass-mode');
       document.body.style.background = `url('${savedCustomBg}') center/cover fixed`;
     }
