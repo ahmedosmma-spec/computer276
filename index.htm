@@ -3,7 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مصروفاتي</title>
+<title>مصروفاتي - تتبع مصاريفك بسهولة</title>
+
+<!-- أيقونة التطبيق -->
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+
+<!-- بيانات SEO -->
+<meta name="description" content="تطبيق مصروفاتي لمتابعة وتتبع مصاريفك اليومية وإدارتها بذكاء وسهولة.">
+<meta property="og:title" content="مصروفاتي">
+<meta property="og:description" content="اعرف فلوسك راحت فين بسهولة">
+<meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+
 <style>
 * {
   box-sizing: border-box;
@@ -11,29 +22,47 @@
 }
 :root {
   --bg-color: #101827;
-  --card-bg: #1b293d;
-  --input-bg: #0c1524;
+  --card-bg: rgba(27, 41, 61, 0.85);
+  --input-bg: rgba(12, 21, 36, 0.6);
   --text-color: #ffffff;
   --accent-color: #69e0b1;
+  --card-border: 1px solid rgba(255, 255, 255, 0.1);
+  --card-backdrop: blur(10px);
+}
+/* 1. النمط الكلاسيكي */
+body.theme-classic {
+  --card-bg: #1b293d;
+  --input-bg: #0c1524;
   --card-border: 1px solid rgba(255, 255, 255, 0.05);
   --card-backdrop: none;
 }
-body.glass-mode {
+
+/* 2. النمط الضبابي (Blur) */
+body.theme-blur {
   --card-bg: rgba(255, 255, 255, 0.08);
-  --input-bg: rgba(0, 0, 0, 0.25);
-  --card-border: 1px solid rgba(255, 255, 255, 0.18);
-  --card-backdrop: blur(16px);
+  --input-bg: rgba(0, 0, 0, 0.3);
+  --card-border: 1px solid rgba(255, 255, 255, 0.15);
+  --card-backdrop: blur(20px);
 }
+
+/* 3. نمط ليكود جلاس (Liquid Glass النقي) */
+body.theme-liquid {
+  --card-bg: rgba(255, 255, 255, 0.12);
+  --input-bg: rgba(0, 0, 0, 0.25);
+  --card-border: 1px solid rgba(255, 255, 255, 0.3);
+  --card-backdrop: blur(30px) saturate(190%);
+}
+
 body {
   margin: 0;
-  padding: 20px 20px 100px 20px;
-  background: var(--bg-color);
+  padding: 20px 20px 110px 20px;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   color: var(--text-color);
-  font-family: Arial, sans-serif;
-  transition: background 0.4s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.4s ease;
   min-height: 100vh;
 }
 .container {
@@ -45,60 +74,93 @@ body.ios-blurred .container {
   filter: blur(12px) brightness(0.7);
   pointer-events: none;
 }
-h1, h2 {
+h1, h2, h3 {
   text-align: center;
+  margin-top: 5px;
 }
 .card {
   background: var(--card-bg);
   backdrop-filter: var(--card-backdrop);
   -webkit-backdrop-filter: var(--card-backdrop);
-  padding: 18px;
-  border-radius: 20px;
-  margin-bottom: 18px;
+  padding: 20px;
+  border-radius: 24px;
+  margin-bottom: 20px;
   border: var(--card-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 12px 35px 0 rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease;
 }
+body.theme-liquid .card {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
 .total {
   text-align: center;
-  font-size: 30px;
+  font-size: 32px;
   color: var(--accent-color);
   font-weight: bold;
 }
+
 input, select, button {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   margin: 7px 0;
-  border-radius: 12px;
+  border-radius: 14px;
   border: none;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
 }
 input, select {
   background: var(--input-bg);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 button {
   background: var(--accent-color);
   color: #10251e;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform 0.1s ease, background 0.3s ease;
 }
 button:active {
   transform: scale(0.98);
 }
+/* نمط خيارات الأزرار (3 خيارات للزجاج) */
+.glass-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.glass-btn {
+  flex: 1;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.glass-btn.active {
+  background: var(--accent-color);
+  color: #10251e;
+  border-color: var(--accent-color);
+  font-weight: bold;
+}
+
 .expense {
   background: var(--input-bg);
-  padding: 12px;
+  padding: 14px;
   margin-top: 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .expense-info {
   overflow-wrap: anywhere;
@@ -106,7 +168,7 @@ button:active {
 .expense small {
   display: block;
   color: #a9b7ca;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 .expense strong {
   color: var(--accent-color);
@@ -117,7 +179,7 @@ button:active {
   color: white;
   padding: 7px 12px;
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 12px;
   width: auto;
 }
 .empty {
@@ -126,14 +188,15 @@ button:active {
 }
 .page { display: none; }
 .page.active { display: block; }
+
 .bottom-nav {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(27, 41, 61, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(27, 41, 61, 0.8);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 35px;
   display: flex;
@@ -145,9 +208,7 @@ button:active {
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   z-index: 9999;
   touch-action: none;
-  transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
 }
-.bottom-nav.dragging { transition: none !important; }
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -155,197 +216,241 @@ button:active {
   color: #a9b7ca;
   text-decoration: none;
   font-size: 12px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
 }
 .nav-item.active {
   color: var(--accent-color);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
-.nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 3px; }
-.verified-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  background-color: #20d5ec;
-  color: #101827;
-  border-radius: 50%;
-  font-size: 10px;
-  margin-right: 4px;
-  margin-left: 4px;
-}
-.profile-header { text-align: center; padding: 20px 0; }
+.nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
+
+.profile-header { text-align: center; padding: 15px 0; }
 .profile-avatar {
   width: 90px; height: 90px; border-radius: 50%; background: var(--accent-color);
-  display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;
   font-size: 40px; color: #10251e; box-shadow: 0 4px 15px rgba(105, 224, 177, 0.3);
 }
-.profile-name { font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-.setting-group { margin-bottom: 15px; }
-.setting-group label { display: block; margin-bottom: 5px; color: #a9b7ca; }
+.map-box {
+  width: 100%; height: 160px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);
+  background: url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80') center/cover;
+  display: flex; align-items: center; justify-content: center; font-weight: bold;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.8); margin-top: 10px;
+}
 </style>
 </head>
-<body>
+<body class="theme-liquid">
 <div class="container">
+
+  <!-- صفحة مصروفاتي -->
   <div id="page-home" class="page active">
-    <h1>💰 <span data-lang="title">مصروفاتي</span></h1>
-    <p style="text-align:center;color:#a9b7ca" data-lang="subtitle">اعرف فلوسك راحت فين</p>
+    <h1>💸 <span data-lang="title">مصروفاتي</span></h1>
+    <p style="text-align:center;color:#a9b7ca" data-lang="subtitle">أهلاً بك 👋🏼</p>
+    
     <div class="card">
-      <h2 data-lang="total_title">إجمالي المصروفات</h2>
-      <div class="total" id="total">0 جنيه</div>
-      <p style="text-align:center" id="count">عدد العمليات: 0</p>
+      <h2 data-lang="total_title">إجمالي ما تم صرفه</h2>
+      <div class="total" id="total">- 0.0 ج.م</div>
+      <p style="text-align:center; margin-bottom:0" id="count">عدد العمليات: 0</p>
     </div>
+
     <div class="card">
-      <h2 data-lang="add_title">إضافة مصروف</h2>
+      <h2 data-lang="add_title">تسجيل مصروف جديد</h2>
       <form id="expenseForm">
-        <label for="name" data-lang="lbl_name">دفعت في إيه؟</label>
-        <input id="name" type="text" placeholder="مثلاً: سندوتشات" maxlength="80" required>
-        <label for="amount" data-lang="lbl_amount">المبلغ بالجنيه</label>
-        <input id="amount" type="number" min="0.01" step="0.01" placeholder="مثلاً: 25" required>
-        <label for="category" data-lang="lbl_cat">نوع المصروف</label>
+        <label for="name" data-lang="lbl_name">الإدخال (دفعت في إيه؟):</label>
+        <input id="name" type="text" placeholder="مثلاً: سندوتشات / بنزين" maxlength="80" required>
+        
+        <label for="amount" data-lang="lbl_amount">السعر (المبلغ):</label>
+        <input id="amount" type="number" min="0.01" step="0.01" placeholder="مثلاً: 500" required>
+        
+        <label for="category" data-lang="lbl_cat">نوع المنتج / المصروف:</label>
         <select id="category">
-          <option value="أكل وشرب">أكل وشرب</option>
-          <option value="مواصلات">مواصلات</option>
-          <option value="صيدلية">صيدلية</option>
-          <option value="دراسة">دراسة</option>
-          <option value="ألعاب وترفيه">ألعاب وترفيه</option>
+          <option value="طعام">طعام (أكل وشرب)</option>
+          <option value="فواتير">فواتير</option>
+          <option value="أدوية">أدوية وصيدلية</option>
+          <option value="مستلزمات">مستلزمات منزلية</option>
+          <option value="ألعاب">ألعاب وترفيه</option>
           <option value="ملابس">ملابس</option>
+          <option value="مواصلات">مواصلات</option>
           <option value="أخرى">أخرى</option>
         </select>
-        <label for="date" data-lang="lbl_date">تاريخ المصروف</label>
+        
+        <label for="date" data-lang="lbl_date">التاريخ:</label>
         <input id="date" type="date" required>
-        <button type="submit" data-lang="btn_add">تسجيل المصروف</button>
+        
+        <button type="submit" data-lang="btn_add">حفظ المصروف</button>
       </form>
     </div>
     <div class="card">
       <h2 data-lang="list_title">📋 سجل المصروفات</h2>
-      <label for="filter" data-lang="lbl_filter">عرض المصروفات</label>
+      <label for="filter" data-lang="lbl_filter">تصفية حسب الوقت:</label>
       <select id="filter">
+        <option value="day" data-lang="opt_day">اليوم</option>
+        <option value="week" data-lang="opt_week">هذا الأسبوع</option>
+        <option value="month" data-lang="opt_month" selected>الشهر الحالي</option>
+        <option value="year" data-lang="opt_year">السنة الحالية</option>
         <option value="all" data-lang="opt_all">كل المصروفات</option>
-        <option value="month" data-lang="opt_month">الشهر الحالي</option>
       </select>
       <div id="list"></div>
     </div>
+
+    <div class="card">
+      <h3 data-lang="map_title">📍 إضافه موقع</h3>
+      <div class="map-box">
+        <span>📍 موقع الشراء المكتشف</span>
+      </div>
+    </div>
   </div>
+  <!-- صفحة أنا -->
   <div id="page-profile" class="page">
+    <h1 data-lang="profile_title">👤 أنا</h1>
     <div class="card profile-header">
       <div class="profile-avatar" id="avatarContainer" style="cursor: pointer; overflow: hidden; position: relative;">
         <span id="avatarEmoji">👤</span>
         <img id="avatarImg" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;" />
       </div>
       <input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
-      <button type="button" onclick="document.getElementById('customAvatarInput').click()" style="background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 12px; padding: 6px; width: auto; margin-top: 8px;" data-lang="btn_change_avatar">تغيير الصورة الشخصية</button>
-      
-      <div class="profile-name" style="margin-top: 10px;">
-        <span data-lang="user_name">مستخدم مميز</span>
-        <span class="verified-badge" title="حساب موثق">✓</span>
+      <button type="button" onclick="document.getElementById('customAvatarInput').click()" style="background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 12px; padding: 6px; width: auto; margin-top: 5px;" data-lang="btn_change_avatar">تغيير الصورة الشخصية</button>
+
+      <div style="margin-top: 15px; text-align: right;">
+        <label data-lang="lbl_user_name">الاسم:</label>
+        <input type="text" id="userNameInput" value="مستخدم مميز" placeholder="ادخل اسمك">
+        
+        <label data-lang="lbl_user_email">الإيميل:</label>
+        <input type="email" id="userEmailInput" value="user@example.com" placeholder="example@mail.com">
+        
+        <label data-lang="lbl_user_address">العنوان (اختياري):</label>
+        <input type="text" id="userAddressInput" placeholder="مثلاً: القاهرة, مصر">
+        <button type="button" onclick="saveProfileInfo()" style="margin-top:10px;" data-lang="btn_save_profile">حفظ البيانات الشخصية</button>
       </div>
-      <p style="color:#a9b7ca; font-size:14px; margin-top:5px;" data-lang="user_status">صاحب القرار والفلوس 💰</p>
     </div>
+
     <div class="card">
-      <h3 data-lang="stats_summary">ملخص إحصائياتك</h3>
-      <p>💡 <span data-lang="tip_msg">استمر في تتبع مصروفاتك لتحقيق أهدافك المالية!</span></p>
+      <h3 data-lang="tips_title">💡 نصائح تفيدنا</h3>
+      <p style="color:#a9b7ca; line-height: 1.6;" data-lang="tip_msg">
+        • قم بتقسيم دخل الشهر لـ 50% للأساسيات، 30% لرغباتك، و 20% للادخار.<br>
+        • راجع سجل المصروفات أسبوعياً لمعرفة البنود التي تستهلك ميزانيتك.
+      </p>
     </div>
   </div>
-
+  <!-- صفحة الإعدادات -->
   <div id="page-settings" class="page">
     <h1 data-lang="settings_title">⚙️ الإعدادات</h1>
+    
     <div class="card">
-      <h2 data-lang="customize_title">تخصيص المظهر والتصميم</h2>
-      <div class="setting-group">
-        <label for="bgSelect" data-lang="lbl_bg">اختر الخلفية (تتحول الكروت لزجاج فوراً):</label>
-        <select id="bgSelect">
-          <option value="default">الافتراضية (داكن كلاسيك)</option>
-          <option value="gradient1">تدرج بنفسجي أزرق (زجاجي)</option>
-          <option value="gradient2">تدرج نيون ليلي (زجاجي)</option>
-          <option value="img1">طبيعة ونجوم (زجاجي)</option>
-          <option value="img2">خلفية حديثة مودرن (زجاجي)</option>
-        </select>
-      </div>
+      <h3 data-lang="theme_bg_title">الواجهة والخلفية</h3>
+      <label for="bgSelect" data-lang="lbl_bg">لون/خلفية الواجهة:</label>
+      <select id="bgSelect">
+        <option value="gradient1">أزرق داكن (المفضل)</option>
+        <option value="gradient2">نيون ليلي</option>
+        <option value="default">أسود كلاسيك</option>
+        <option value="custom">صورة خاصة من المعرض</option>
+      </select>
       
-      <div class="setting-group">
-        <label for="customBgInput" data-lang="lbl_custom_bg">📁 رفع خلفية مخصصة من المعرض:</label>
+      <div style="margin-top: 10px;">
+        <label for="customBgInput" data-lang="lbl_custom_bg">📁 صورة خاصة من المعرض:</label>
         <input type="file" id="customBgInput" accept="image/*">
       </div>
+    </div>
 
-      <div class="setting-group">
-        <label for="langSelect" data-lang="lbl_lang">تغيير اللغة (Language):</label>
-        <select id="langSelect">
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-        </select>
+    <div class="card">
+      <h3 data-lang="glass_style_title">تأثير الزجاج والمظهر</h3>
+      <div class="glass-options">
+        <div class="glass-btn" id="btn-blur" onclick="setGlassTheme('blur')">
+          <span id="check-blur">◯</span> ضبابي
+        </div>
+        <div class="glass-btn active" id="btn-liquid" onclick="setGlassTheme('liquid')">
+          <span id="check-liquid">✓</span> ليكود جلاس
+        </div>
+        <div class="glass-btn" id="btn-classic" onclick="setGlassTheme('classic')">
+          <span id="check-classic">◯</span> الكلاسيك
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
+    <div class="card">
+      <h3 data-lang="lang_title">اللغة (Language)</h3>
+      <select id="langSelect">
+        <option value="ar">العربية (لغة الجهاز)</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+
+</div>
+<!-- الشريط السفي (Bottom Navigation Bar) -->
 <div class="bottom-nav" id="draggableNav">
   <div class="nav-item active" data-page="page-home">
-    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    <span data-lang="nav_home">الرئيسية</span>
+    <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1H3.8c.15 2.19 1.76 3.42 3.7 3.86V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+    <span data-lang="nav_home">مصروفاتي</span>
   </div>
   <div class="nav-item" data-page="page-profile">
     <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-    <span style="display:flex; align-items:center;">
-      <span data-lang="nav_me">أنا</span>
-      <span class="verified-badge">✓</span>
-    </span>
+    <span data-lang="nav_me">أنا</span>
   </div>
   <div class="nav-item" data-page="page-settings">
-    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/></svg>
     <span data-lang="nav_settings">الإعدادات</span>
   </div>
 </div>
 <script>
-const STORAGE_KEY = "masrofaty_data";
-const SETTINGS_KEY = "masrofaty_settings";
+  document.getElementById('bgSelect').addEventListener('change', function(e) {
+  const val = e.target.value;
+  if (val === 'gradient1') {
+    document.body.style.background = 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)';
+    localStorage.setItem('masrofaty_bg_type', 'preset');
+  } else if (val === 'gradient2') {
+    document.body.style.background = 'linear-gradient(135deg, #12002b, #32004a, #0f0c29)';
+    localStorage.setItem('masrofaty_bg_type', 'preset');
+  } else if (val === 'default') {
+    document.body.style.background = '#101827';
+    localStorage.setItem('masrofaty_bg_type', 'default');
+  }
+  saveSettings();
+});
+
+const STORAGE_KEY = "masrofaty_data_v2";
+const SETTINGS_KEY = "masrofaty_settings_v2";
 
 const translations = {
   ar: {
-    title: "مصروفاتي", subtitle: "اعرف فلوسك راحت فين", total_title: "إجمالي المصروفات",
-    add_title: "إضافة مصروف", lbl_name: "دفعت في إيه؟", lbl_amount: "المبلغ بالجنيه",
-    lbl_cat: "نوع المصروف", lbl_date: "تاريخ المصروف", btn_add: "تسجيل المصروف",
-    list_title: "📋 سجل المصروفات", lbl_filter: "عرض المصروفات", opt_all: "كل المصروفات",
-    opt_month: "الشهر الحالي", nav_home: "الرئيسية", nav_me: "أنا", nav_settings: "الإعدادات",
-    user_name: "مستخدم مميز", user_status: "صاحب القرار والفلوس 💰", stats_summary: "ملخص إحصائياتك",
-    tip_msg: "استمر في تتبع مصروفاتك لتحقيق أهدافك المالية!", settings_title: "⚙️ الإعدادات",
-    customize_title: "تخصيص المظهر والتصميم", lbl_bg: "اختر الخلفية (تتحول الكروت لزجاج فوراً):",
-    lbl_custom_bg: "📁 رفع خلفية مخصصة من المعرض:",
-    btn_change_avatar: "تغيير الصورة الشخصية",
-    lbl_lang: "تغيير اللغة (Language):", currency: "جنيه", currency_short: "ج.م",
-    ops_count: "عدد العمليات: ", empty_msg: "لسه مفيش مصروفات مسجلة.", delete_btn: "حذف",
-    confirm_del: "متأكد إنك عايز تحذف المصروف؟"
+    title: "مصروفاتي", subtitle: "اهلا", total_title: "الاجمالي",
+    add_title: "تسجيل مصروف جديد", lbl_name: "الإدخال (دفعت في إيه؟):", lbl_amount: "السعر (المبلغ):",
+    lbl_cat: "نوع المنتج / المصروف:", lbl_date: "التاريخ:", btn_add: "حفظ المصروف",
+    list_title: " سجل المصروفات", lbl_filter: "تصفية حسب الوقت:", opt_day: "اليوم",
+    opt_week: "هذا الأسبوع", opt_month: "الشهر الحالي", opt_year: "السنة الحالية",
+    opt_all: "كل المصروفات", nav_home: "مصروفاتي", nav_me: "أنا", nav_settings: "الإعدادات",
+    profile_title: " أنا", btn_change_avatar: "تغيير الصورة الشخصية", lbl_user_name: "الاسم:",
+    lbl_user_email: "الإيميل:", lbl_user_address: "العنوان (براحتك):", btn_save_profile: "حفظ البيانات الشخصية",
+    tips_title: "💡 نصايح ممكن تفيدك", map_title: "📍 إضافه موقع", settings_title: " الإعدادات",
+    theme_bg_title: "الواجهة والخلفية", lbl_bg: "لون/خلفية الواجهة:", lbl_custom_bg: "📁 صورة خاصة من المعرض:",
+    glass_style_title: "تأثير الزجاج والمظهر", lang_title: "اللغة (Language)", currency: "ج",
+    ops_count: "عدد العمليات: ", empty_msg: "لا يوجد مصروفات مسجلة في هذه الفترة.", delete_btn: "حذف"
   },
   en: {
-    title: "My Expenses", subtitle: "Track where your money goes", total_title: "Total Expenses",
-    add_title: "Add Expense", lbl_name: "What did you pay for?", lbl_amount: "Amount (EGP)",
-    lbl_cat: "Category", lbl_date: "Date", btn_add: "Save Expense",
-    list_title: "📋 Expense History", lbl_filter: "Filter View", opt_all: "All Expenses",
-    opt_month: "Current Month", nav_home: "Home", nav_me: "Me", nav_settings: "Settings",
-    user_name: "Pro User", user_status: "Master of Money 💰", stats_summary: "Your Summary Stats",
-    tip_msg: "Keep tracking your expenses to reach financial stability!", settings_title: "⚙️ Settings",
-    customize_title: "Theme & Customization", lbl_bg: "Choose Background (Activates Glass Effect):",
-    lbl_custom_bg: "📁 Upload Custom Background:",
-    btn_change_avatar: "Change Profile Picture",
-    lbl_lang: "Change Language:", currency: "EGP", currency_short: "EGP",
-    ops_count: "Transactions: ", empty_msg: "No expenses recorded yet.", delete_btn: "Delete",
-    confirm_del: "Are you sure you want to delete this expense?"
+    title: "My Expenses", subtitle: "Welcome 👋🏼", total_title: "Total Spent",
+    add_title: "Add New Expense", lbl_name: "Item Name:", lbl_amount: "Price / Amount:",
+    lbl_cat: "Category:", lbl_date: "Date:", btn_add: "Save Expense",
+    list_title: "📋 Expense History", lbl_filter: "Filter by Time:", opt_day: "Today",
+    opt_week: "This Week", opt_month: "Current Month", opt_year: "Current Year",
+    opt_all: "All Expenses", nav_home: "Expenses", nav_me: "Profile", nav_settings: "Settings",
+    profile_title: "👤 Profile", btn_change_avatar: "Change Profile Picture", lbl_user_name: "Name:",
+    lbl_user_email: "Email:", lbl_user_address: "Address (Optional):", btn_save_profile: "Save Profile",
+    tips_title: "💡 Financial Tips", map_title: "📍 Location Added", settings_title: "⚙️ Settings",
+    theme_bg_title: "Interface Background", lbl_bg: "Theme Color:", lbl_custom_bg: "📁 Custom Gallery Image:",
+    glass_style_title: "Glass Effect & Appearance", lang_title: "Language", currency: "EGP",
+    ops_count: "Transactions: ", empty_msg: "No expenses recorded for this period.", delete_btn: "Delete"
   }
 };
 
 let currentLang = "ar";
 let expenses = [];
-
+let currentGlassTheme = "liquid";
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
   expenses = saved ? JSON.parse(saved) : [];
-  if (!Array.isArray(expenses)) expenses = [];
-} catch (error) { expenses = []; }
+} catch (e) { expenses = []; }
 
 function today() {
   const d = new Date();
@@ -357,20 +462,51 @@ function saveData() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
     return true;
-  } catch (error) { alert("تعذر حفظ البيانات في المتصفح."); return false; }
+  } catch (e) { return false; }
 }
 
 function formatMoney(amount) {
   return Number(amount).toLocaleString(currentLang === 'ar' ? "ar-EG" : "en-US", { maximumFractionDigits: 2 });
 }
+
+function setGlassTheme(theme) {
+  currentGlassTheme = theme;
+  document.body.classList.remove('theme-blur', 'theme-liquid', 'theme-classic');
+  document.body.classList.add('theme-' + theme);
+
+  document.querySelectorAll('.glass-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('check-blur').textContent = '◯';
+  document.getElementById('check-liquid').textContent = '◯';
+  document.getElementById('check-classic').textContent = '◯';
+
+  document.getElementById('btn-' + theme).classList.add('active');
+  document.getElementById('check-' + theme).textContent = '✓';
+
+  saveSettings();
+}
 function render() {
   const list = document.getElementById("list");
   const filter = document.getElementById("filter").value;
-  const currentMonth = today().slice(0, 7);
-  const shown = expenses.filter(item => filter === "all" || item.date.slice(0, 7) === currentMonth).slice().reverse();
+  const now = new Date();
+  const todayStr = today();
+  
+  const shown = expenses.filter(item => {
+    if (filter === "all") return true;
+    if (filter === "day") return item.date === todayStr;
+    if (filter === "month") return item.date.slice(0, 7) === todayStr.slice(0, 7);
+    if (filter === "year") return item.date.slice(0, 4) === todayStr.slice(0, 4);
+    if (filter === "week") {
+      const itemDate = new Date(item.date);
+      const diffTime = Math.abs(now - itemDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 7;
+    }
+    return true;
+  }).slice().reverse();
+
   const total = shown.reduce((sum, item) => sum + Number(item.amount), 0);
 
-  document.getElementById("total").textContent = formatMoney(total) + " " + translations[currentLang].currency;
+  document.getElementById("total").textContent = "- " + formatMoney(total) + " " + translations[currentLang].currency;
   document.getElementById("count").textContent = translations[currentLang].ops_count + shown.length;
   list.replaceChildren();
 
@@ -389,17 +525,16 @@ function render() {
     const details = document.createElement("small"); details.textContent = item.category + " | " + item.date;
     info.append(name, details);
     const right = document.createElement("div");
-    const amount = document.createElement("strong"); amount.textContent = formatMoney(item.amount) + " " + translations[currentLang].currency_short;
+    const amount = document.createElement("strong"); amount.textContent = "- " + formatMoney(item.amount) + " " + translations[currentLang].currency;
     const del = document.createElement("button"); del.className = "delete"; del.textContent = translations[currentLang].delete_btn;
     del.addEventListener("click", () => {
-      if (!confirm(translations[currentLang].confirm_del)) return;
       expenses = expenses.filter(expense => expense.id !== item.id);
       if (saveData()) render();
     });
     right.append(amount, del); box.append(info, right); list.appendChild(box);
   });
 }
-
+// التنقل بين الصفحات
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -409,94 +544,42 @@ document.querySelectorAll('.nav-item').forEach(item => {
   });
 });
 
-let pressTimer;
-document.querySelectorAll('.nav-item').forEach(btn => {
-  const startPress = () => { pressTimer = setTimeout(() => { document.body.classList.add('ios-blurred'); }, 400); };
-  const cancelPress = () => { clearTimeout(pressTimer); document.body.classList.remove('ios-blurred'); };
-  btn.addEventListener('touchstart', startPress);
-  btn.addEventListener('touchend', cancelPress);
-  btn.addEventListener('mousedown', startPress);
-  btn.addEventListener('mouseup', cancelPress);
-  btn.addEventListener('mouseleave', cancelPress);
-});
+// حفظ البيانات الشخصية
+function saveProfileInfo() {
+  const name = document.getElementById('userNameInput').value;
+  const email = document.getElementById('userEmailInput').value;
+  const address = document.getElementById('userAddressInput').value;
+  localStorage.setItem('masrofaty_profile', JSON.stringify({ name, email, address }));
+  alert("تم حفظ البيانات الشخصية بنجاح!");
+}
 
-const nav = document.getElementById('draggableNav');
-let isDragging = false, startX, startY;
-const startDrag = (e) => {
-  isDragging = true; nav.classList.add('dragging');
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  const rect = nav.getBoundingClientRect();
-  startX = clientX - rect.left; startY = clientY - rect.top;
-};
-const doDrag = (e) => {
-  if (!isDragging) return;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  nav.style.left = `${clientX - startX}px`;
-  nav.style.top = `${clientY - startY}px`;
-  nav.style.bottom = 'auto'; nav.style.transform = 'none';
-};
-const stopDrag = () => {
-  if (!isDragging) return;
-  isDragging = false; nav.classList.remove('dragging');
-  nav.style.left = '50%'; nav.style.top = 'auto'; nav.style.bottom = '20px';
-  nav.style.transform = 'translateX(-50%)';
-};
-nav.addEventListener('mousedown', startDrag);
-document.addEventListener('mousemove', doDrag);
-document.addEventListener('mouseup', stopDrag);
-nav.addEventListener('touchstart', startDrag);
-document.addEventListener('touchmove', doDrag);
-document.addEventListener('touchend', stopDrag);
-
-const bgSelect = document.getElementById('bgSelect');
-bgSelect.addEventListener('change', (e) => { applyBackground(e.target.value); saveSettings(); });
-
-function applyBackground(val) {
-  if (val === 'default') {
-    document.body.style.background = '#101827';
-    document.body.classList.remove('glass-mode');
-    localStorage.removeItem('masrofaty_custom_bg');
-    localStorage.setItem('masrofaty_bg_type', 'default');
-  } else {
-    document.body.classList.add('glass-mode');
-    localStorage.setItem('masrofaty_bg_type', 'preset');
-    if (val === 'gradient1') document.body.style.background = 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)';
-    else if (val === 'gradient2') document.body.style.background = 'linear-gradient(135deg, #12002b, #32004a, #0f0c29)';
-    else if (val === 'img1') document.body.style.background = "url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80') center/cover fixed";
-    else if (val === 'img2') document.body.style.background = "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80') center/cover fixed";
+function loadProfileInfo() {
+  const saved = localStorage.getItem('masrofaty_profile');
+  if (saved) {
+    const data = JSON.parse(saved);
+    if(data.name) document.getElementById('userNameInput').value = data.name;
+    if(data.email) document.getElementById('userEmailInput').value = data.email;
+    if(data.address) document.getElementById('userAddressInput').value = data.address;
   }
 }
 
+// تغيير رفع صورة البروفايل والخلفية
 const customAvatarInput = document.getElementById('customAvatarInput');
-const avatarImg = document.getElementById('avatarImg');
-const avatarEmoji = document.getElementById('avatarEmoji');
-
 if (customAvatarInput) {
   customAvatarInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = function(event) {
-        const base64Image = event.target.result;
-        avatarImg.src = base64Image;
-        avatarImg.style.display = 'block';
-        avatarEmoji.style.display = 'none';
-        localStorage.setItem('masrofaty_avatar', base64Image);
+        document.getElementById('avatarImg').src = event.target.result;
+        document.getElementById('avatarImg').style.display = 'block';
+        document.getElementById('avatarEmoji').style.display = 'none';
+        localStorage.setItem('masrofaty_avatar', event.target.result);
       };
       reader.readAsDataURL(file);
     }
   });
 }
-
-const savedAvatar = localStorage.getItem('masrofaty_avatar');
-if (savedAvatar) {
-  avatarImg.src = savedAvatar;
-  avatarImg.style.display = 'block';
-  avatarEmoji.style.display = 'none';
-}
-
 const customBgInput = document.getElementById('customBgInput');
 if (customBgInput) {
   customBgInput.addEventListener('change', function(e) {
@@ -504,57 +587,45 @@ if (customBgInput) {
     if (file) {
       const reader = new FileReader();
       reader.onload = function(event) {
-        const base64Bg = event.target.result;
-        document.body.classList.add('glass-mode');
-        document.body.style.background = `url('${base64Bg}') center/cover fixed`;
-        localStorage.setItem('masrofaty_custom_bg', base64Bg);
+        document.body.style.background = `url('${event.target.result}') center/cover fixed`;
+        localStorage.setItem('masrofaty_custom_bg', event.target.result);
         localStorage.setItem('masrofaty_bg_type', 'custom');
-        saveSettings();
+        document.getElementById('bgSelect').value = 'custom';
       };
       reader.readAsDataURL(file);
     }
   });
 }
 
-const langSelect = document.getElementById('langSelect');
-langSelect.addEventListener('change', (e) => { currentLang = e.target.value; applyLanguage(currentLang); saveSettings(); });
-
-function applyLanguage(lang) {
-  document.getElementById('htmlTag').dir = lang === 'ar' ? 'rtl' : 'ltr';
-  document.getElementById('htmlTag').lang = lang;
-  document.querySelectorAll('[data-lang]').forEach(el => {
-    const key = el.getAttribute('data-lang');
-    if (translations[lang][key]) el.textContent = translations[lang][key];
-  });
-  render();
-}
-
 function saveSettings() {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ bg: bgSelect.value, lang: langSelect.value }));
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+    glassTheme: currentGlassTheme,
+    bg: document.getElementById('bgSelect').value,
+    lang: document.getElementById('langSelect').value
+  }));
 }
 
 function loadSettings() {
   try {
     const saved = localStorage.getItem(SETTINGS_KEY);
-    const bgType = localStorage.getItem('masrofaty_bg_type');
-    const savedCustomBg = localStorage.getItem('masrofaty_custom_bg');
+    const savedBg = localStorage.getItem('masrofaty_custom_bg');
+    const savedAvatar = localStorage.getItem('masrofaty_avatar');
+
+    if (savedAvatar) {
+      document.getElementById('avatarImg').src = savedAvatar;
+      document.getElementById('avatarImg').style.display = 'block';
+      document.getElementById('avatarEmoji').style.display = 'none';
+    }
 
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed.lang) { 
-        langSelect.value = parsed.lang; 
-        currentLang = parsed.lang; 
-        applyLanguage(parsed.lang); 
+      if (parsed.glassTheme) setGlassTheme(parsed.glassTheme);
+      if (parsed.bg) {
+        document.getElementById('bgSelect').value = parsed.bg;
+        if (parsed.bg === 'custom' && savedBg) {
+          document.body.style.background = `url('${savedBg}') center/cover fixed`;
+        }
       }
-      if (parsed.bg && bgType !== 'custom') { 
-        bgSelect.value = parsed.bg; 
-        applyBackground(parsed.bg); 
-      }
-    }
-
-    if (bgType === 'custom' && savedCustomBg) {
-      document.body.classList.add('glass-mode');
-      document.body.style.background = `url('${savedCustomBg}') center/cover fixed`;
     }
   } catch (e) {}
 }
@@ -567,17 +638,20 @@ form.addEventListener("submit", function(event) {
   const category = document.getElementById("category").value;
   const date = document.getElementById("date").value;
 
-  if (!name || !Number.isFinite(amount) || amount <= 0 || !date) { alert("راجع بيانات المصروف."); return; }
+  if (!name || amount <= 0 || !date) return;
 
-  const expense = { id: Date.now() + Math.random(), name, amount, category, date };
+  const expense = { id: Date.now(), name, amount, category, date };
   expenses.push(expense);
-  if (!saveData()) { expenses.pop(); return; }
-  form.reset(); document.getElementById("date").value = today();
+  saveData();
+  form.reset();
+  document.getElementById("date").value = today();
   render();
 });
 
 document.getElementById("filter").addEventListener("change", render);
+
 loadSettings();
+loadProfileInfo();
 render();
 </script>
 </body>
