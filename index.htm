@@ -1,365 +1,575 @@
-
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlTag">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مصروفاتي</title>
 <style>
-  
-/* خلي الأرقام بالإنجليزي */
-input,
-.total,
-.expense strong,
-#count {
-  font-variant-numeric: lining-nums;
-  direction: ltr;
-}
-
-input[type="date"],
-input[type="number"] {
-  text-align: right;
-}
-
 * {
   box-sizing: border-box;
+  user-select: none;
 }
-
+:root {
+  --bg-color: #101827;
+  --card-bg: #1b293d;
+  --input-bg: #0c1524;
+  --text-color: #ffffff;
+  --accent-color: #69e0b1;
+  --card-border: 1px solid rgba(255, 255, 255, 0.05);
+  --card-backdrop: none;
+}
+body.glass-mode {
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.25);
+  --card-border: 1px solid rgba(255, 255, 255, 0.18);
+  --card-backdrop: blur(16px);
+}
 body {
   margin: 0;
-  padding: 20px;
-  background: #101827;
-  color: white;
+  padding: 20px 20px 100px 20px;
+  background: var(--bg-color);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-color);
   font-family: Arial, sans-serif;
+  transition: background 0.4s ease;
+  min-height: 100vh;
 }
-
 .container {
   max-width: 600px;
   margin: auto;
+  transition: filter 0.3s ease;
 }
-
+body.ios-blurred .container {
+  filter: blur(12px) brightness(0.7);
+  pointer-events: none;
+}
 h1, h2 {
   text-align: center;
 }
-
 .card {
-  background: #1b293d;
+  background: var(--card-bg);
+  backdrop-filter: var(--card-backdrop);
+  -webkit-backdrop-filter: var(--card-backdrop);
   padding: 18px;
-  border-radius: 15px;
+  border-radius: 20px;
   margin-bottom: 18px;
+  border: var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s ease;
 }
-
 .total {
   text-align: center;
   font-size: 30px;
-  color: #69e0b1;
+  color: var(--accent-color);
   font-weight: bold;
 }
-
 input, select, button {
   width: 100%;
   padding: 12px;
   margin: 7px 0;
-  border-radius: 9px;
+  border-radius: 12px;
   border: none;
   font-size: 16px;
+  outline: none;
 }
-
 input, select {
-  background: #0c1524;
+  background: var(--input-bg);
   color: white;
-  border: 1px solid #35445a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 button {
-  background: #69e0b1;
+  background: var(--accent-color);
   color: #10251e;
   font-weight: bold;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
-
+button:active {
+  transform: scale(0.98);
+}
 .expense {
-  background: #0c1524;
+  background: var(--input-bg);
   padding: 12px;
   margin-top: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .expense-info {
   overflow-wrap: anywhere;
 }
-
 .expense small {
   display: block;
   color: #a9b7ca;
   margin-top: 5px;
 }
-
 .expense strong {
-  color: #69e0b1;
+  color: var(--accent-color);
   white-space: nowrap;
 }
-
 .delete {
   background: #ff7785;
-  padding: 7px;
+  color: white;
+  padding: 7px 12px;
   margin-top: 6px;
   font-size: 13px;
+  width: auto;
 }
-
 .empty {
   text-align: center;
   color: #a9b7ca;
 }
+.page { display: none; }
+.page.active { display: block; }
+.bottom-nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(27, 41, 61, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 35px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 15px;
+  width: calc(100% - 40px);
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 9999;
+  touch-action: none;
+  transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
+}
+.bottom-nav.dragging { transition: none !important; }
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #a9b7ca;
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.nav-item.active {
+  color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.1);
+}
+.nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 3px; }
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-color: #20d5ec;
+  color: #101827;
+  border-radius: 50%;
+  font-size: 10px;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+.profile-header { text-align: center; padding: 20px 0; }
+.profile-avatar {
+  width: 90px; height: 90px; border-radius: 50%; background: var(--accent-color);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;
+  font-size: 40px; color: #10251e; box-shadow: 0 4px 15px rgba(105, 224, 177, 0.3);
+}
+.profile-name { font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+.setting-group { margin-bottom: 15px; }
+.setting-group label { display: block; margin-bottom: 5px; color: #a9b7ca; }
 </style>
 </head>
-
 <body>
 <div class="container">
-
-  <h1>💰 مصروفاتي</h1>
-  <p style="text-align:center;color:#a9b7ca">
-    اعرف فلوسك راحت فين
-  </p>
-
-  <div class="card">
-    <h2>إجمالي المصروفات</h2>
-    <div class="total" id="total">0 جنيه</div>
-    <p style="text-align:center" id="count">
-      عدد العمليات: 0
-    </p>
-  </div>
-
-  <div class="card">
-    <h2>إضافة مصروف</h2>
-
-    <form id="expenseForm">
-      <label for="name">دفعت في إيه؟</label>
-      <input
-        id="name"
-        type="text"
-        placeholder="مثلاً: سندوتشات"
-        maxlength="80"
-        required
-      >
-
-      <label for="amount">المبلغ بالجنيه</label>
-      <input
-        id="amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        placeholder="مثلاً: 25"
-        required
-      >
-
-      <label for="category">نوع المصروف</label>
-      <select id="category">
-        <option>أكل وشرب</option>
-        <option>مواصلات</option>
-        <option>دراسة</option>
-        <option>ألعاب وترفيه</option>
-        <option>ملابس</option>
-        <option>أخرى</option>
+  <div id="page-home" class="page active">
+    <h1>💰 <span data-lang="title">مصروفاتي</span></h1>
+    <p style="text-align:center;color:#a9b7ca" data-lang="subtitle">اعرف فلوسك راحت فين</p>
+    <div class="card">
+      <h2 data-lang="total_title">إجمالي المصروفات</h2>
+      <div class="total" id="total">0 جنيه</div>
+      <p style="text-align:center" id="count">عدد العمليات: 0</p>
+    </div>
+    <div class="card">
+      <h2 data-lang="add_title">إضافة مصروف</h2>
+      <form id="expenseForm">
+        <label for="name" data-lang="lbl_name">دفعت في إيه؟</label>
+        <input id="name" type="text" placeholder="مثلاً: سندوتشات" maxlength="80" required>
+        <label for="amount" data-lang="lbl_amount">المبلغ بالجنيه</label>
+        <input id="amount" type="number" min="0.01" step="0.01" placeholder="مثلاً: 25" required>
+        <label for="category" data-lang="lbl_cat"        <label for="category" data-lang="lbl_cat">نوع المصروف</label>
+        <select id="category">
+          <option value="أكل وشرب">أكل وشرب</option>
+          <option value="مواصلات">مواصلات</option>
+          <option value="صيدلية">صيدلية</option>
+          <option value="دراسة">دراسة</option>
+          <option value="ألعاب وترفيه">ألعاب وترفيه</option>
+          <option value="ملابس">ملابس</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+option>
+        </select>
+        <label for="date" data-lang="lbl_date">تاريخ المصروف</label>
+        <input id="date" type="date" required>
+        <button type="submit" data-lang="btn_add">تسجيل المصروف</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2 data-lang="list_title">📋 سجل المصروفات</h2>
+      <label for="filter" data-lang="lbl_filter">عرض المصروفات</label>
+      <select id="filter">
+        <option value="all" data-lang="opt_all">كل المصروفات</option>
+        <option value="month" data-lang="opt_month">الشهر الحالي</option>
       </select>
-
-      <label for="date">تاريخ المصروف</label>
-      <input id="date" type="date" required>
-
-      <button type="submit">تسجيل المصروف</button>
-    </form>
+      <div id="list"></div>
+    </div>
+  </div>
+  <!-- صفحة الملف الشخصي (تم تعديلها لتدعم رفع الصورة الشخصية) -->
+  <div id="page-profile" class="page">
+    <div class="card profile-header">
+      <div class="profile-avatar" id="avatarContainer" style="cursor: pointer; overflow: hidden; position: relative;">
+        <span id="avatarEmoji">👤</span>
+        <img id="avatarImg" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;" />
+      </div>
+      <input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
+      <button type="button" onclick="document.getElementById('customAvatarInput').click()" style="background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 12px; padding: 6px; width: auto; margin-top: 8px;" data-lang="btn_change_avatar">تغيير الصورة الشخصية</button>
+      
+      <div class="profile-name" style="margin-top: 10px;">
+        <span data-lang="user_name">مستخدم مميز</span>
+        <span class="verified-badge" title="حساب موثق">✓</span>
+      </div>
+      <p style="color:#a9b7ca; font-size:14px; margin-top:5px;" data-lang="user_status">صاحب القرار والفلوس 💰</p>
+    </div>
+    <div class="card">
+      <h3 data-lang="stats_summary">ملخص إحصائياتك</h3>
+      <p>💡 <span data-lang="tip_msg">استمر في تتبع مصروفاتك لتحقيق أهدافك المالية!</span></p>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>📋 سجل المصروفات</h2>
+  <!-- صفحة الإعدادات (تم إضافة زر رفع الخلفية المخصصة هنا) -->
+  <div id="page-settings" class="page">
+    <h1 data-lang="settings_title">⚙️ الإعدادات</h1>
+    <div class="card">
+      <h2 data-lang="customize_title">تخصيص المظهر والتصميم</h2>
+      <div class="setting-group">
+        <label for="bgSelect" data-lang="lbl_bg">اختر الخلفية (تتحول الكروت لزجاج فوراً):</label>
+        <select id="bgSelect">
+          <option value="default">الافتراضية (داكن كلاسيك)</option>
+          <option value="gradient1">تدرج بنفسجي أزرق (زجاجي)</option>
+          <option value="gradient2">تدرج نيون ليلي (زجاجي)</option>
+          <option value="img1">طبيعة ونجوم (زجاجي)</option>
+          <option value="img2">خلفية حديثة مودرن (زجاجي)</option>
+        </select>
+      </div>
+      
+      <!-- [مكان البحث]: زر رفع خلفية مخصصة من المعرض -->
+      <div class="setting-group">
+        <label for="customBgInput" data-lang="lbl_custom_bg">📁 رفع خلفية مخصصة من المعرض:</label>
+        <input type="file" id="customBgInput" accept="image/*">
+      </div>
 
-    <label for="filter">عرض المصروفات</label>
-    <select id="filter">
-      <option value="all">كل المصروفات</option>
-      <option value="month">الشهر الحالي</option>
-    </select>
-
-    <div id="list"></div>
+      <div class="setting-group">
+        <label for="langSelect" data-lang="lbl_lang">تغيير اللغة (Language):</label>
+        <select id="langSelect">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
   </div>
-
 </div>
 
+<div class="bottom-nav" id="draggableNav">
+  <div class="nav-item active" data-page="page-home">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    <span data-lang="nav_home">الرئيسية</span>
+  </div>
+  <div class="nav-item" data-page="page-profile">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    <span style="display:flex; align-items:center;">
+      <span data-lang="nav_me">أنا</span>
+      <span class="verified-badge">✓</span>
+    </span>
+  </div>
+  <div class="nav-item" data-page="page-settings">
+    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    <span data-lang="nav_settings">الإعدادات</span>
+  </div>
+</div>
 <script>
 const STORAGE_KEY = "masrofaty_data";
+const SETTINGS_KEY = "masrofaty_settings";
 
-const form = document.getElementById("expenseForm");
-const nameInput = document.getElementById("name");
-const amountInput = document.getElementById("amount");
-const categoryInput = document.getElementById("category");
-const dateInput = document.getElementById("date");
+const translations = {
+  ar: {
+    title: "مصروفاتي", subtitle: "اعرف فلوسك راحت فين", total_title: "إجمالي المصروفات",
+    add_title: "إضافة مصروف", lbl_name: "دفعت في إيه؟", lbl_amount: "المبلغ بالجنيه",
+    lbl_cat: "نوع المصروف", lbl_date: "تاريخ المصروف", btn_add: "تسجيل المصروف",
+    list_title: "📋 سجل المصروفات", lbl_filter: "عرض المصروفات", opt_all: "كل المصروفات",
+    opt_month: "الشهر الحالي", nav_home: "الرئيسية", nav_me: "أنا", nav_settings: "الإعدادات",
+    user_name: "مستخدم مميز", user_status: "صاحب القرار والفلوس 💰", stats_summary: "ملخص إحصائياتك",
+    tip_msg: "استمر في تتبع مصروفاتك لتحقيق أهدافك المالية!", settings_title: "⚙️ الإعدادات",
+    customize_title: "تخصيص المظهر والتصميم", lbl_bg: "اختر الخلفية (تتحول الكروت لزجاج فوراً):",
+    lbl_custom_bg: "📁 رفع خلفية مخصصة من المعرض:",
+    btn_change_avatar: "تغيير الصورة الشخصية",
+    lbl_lang: "تغيير اللغة (Language):", currency: "جنيه", currency_short: "ج.م",
+    ops_count: "عدد العمليات: ", empty_msg: "لسه مفيش مصروفات مسجلة.", delete_btn: "حذف",
+    confirm_del: "متأكد إنك عايز تحذف المصروف؟"
+  },
+  en: {
+    title: "My Expenses", subtitle: "Track where your money goes", total_title: "Total Expenses",
+    add_title: "Add Expense", lbl_name: "What did you pay for?", lbl_amount: "Amount (EGP)",
+    lbl_cat: "Category", lbl_date: "Date", btn_add: "Save Expense",
+    list_title: "📋 Expense History", lbl_filter: "Filter View", opt_all: "All Expenses",
+    opt_month: "Current Month", nav_home: "Home", nav_me: "Me", nav_settings: "Settings",
+    user_name: "Pro User", user_status: "Master of Money 💰", stats_summary: "Your Summary Stats",
+    tip_msg: "Keep tracking your expenses to reach financial stability!", settings_title: "⚙️ Settings",
+    customize_title: "Theme & Customization", lbl_bg: "Choose Background (Activates Glass Effect):",
+    lbl_custom_bg: "📁 Upload Custom Background:",
+    btn_change_avatar: "Change Profile Picture",
+    lbl_lang: "Change Language:", currency: "EGP", currency_short: "EGP",
+    ops_count: "Transactions: ", empty_msg: "No expenses recorded yet.", delete_btn: "Delete",
+    confirm_del: "Are you sure you want to delete this expense?"
+  }
+};
 
+let currentLang = "ar";
 let expenses = [];
 
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
   expenses = saved ? JSON.parse(saved) : [];
-
-  if (!Array.isArray(expenses)) {
-    expenses = [];
-  }
-} catch (error) {
-  expenses = [];
-}
+  if (!Array.isArray(expenses)) expenses = [];
+} catch (error) { expenses = []; }
 
 function today() {
   const d = new Date();
-
-  return d.getFullYear() + "-" +
-    String(d.getMonth() + 1).padStart(2, "0") + "-" +
-    String(d.getDate()).padStart(2, "0");
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
-
-dateInput.value = today();
+document.getElementById("date").value = today();
 
 function saveData() {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(expenses)
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
     return true;
-  } catch (error) {
-    alert("تعذر حفظ البيانات في المتصفح.");
-    return false;
-  }
+  } catch (error) { alert("تعذر حفظ البيانات في المتصفح."); return false; }
 }
 
 function formatMoney(amount) {
-  return Number(amount).toLocaleString("ar-EG", {
-    maximumFractionDigits: 2
-  });
+  return Number(amount).toLocaleString(currentLang === 'ar' ? "ar-EG" : "en-US", { maximumFractionDigits: 2 });
 }
-
 function render() {
   const list = document.getElementById("list");
   const filter = document.getElementById("filter").value;
-
   const currentMonth = today().slice(0, 7);
+  const shown = expenses.filter(item => filter === "all" || item.date.slice(0, 7) === currentMonth).slice().reverse();
+  const total = shown.reduce((sum, item) => sum + Number(item.amount), 0);
 
-  const shown = expenses
-    .filter(item =>
-      filter === "all" ||
-      item.date.slice(0, 7) === currentMonth
-    )
-    .slice()
-    .reverse();
-
-  const total = shown.reduce(
-    (sum, item) => sum + Number(item.amount),
-    0
-  );
-
-  document.getElementById("total").textContent =
-    formatMoney(total) + " جنيه";
-
-  document.getElementById("count").textContent =
-    "عدد العمليات: " + shown.length;
-
+  document.getElementById("total").textContent = formatMoney(total) + " " + translations[currentLang].currency;
+  document.getElementById("count").textContent = translations[currentLang].ops_count + shown.length;
   list.replaceChildren();
 
   if (shown.length === 0) {
     const empty = document.createElement("p");
     empty.className = "empty";
-    empty.textContent = "لسه مفيش مصروفات مسجلة.";
+    empty.textContent = translations[currentLang].empty_msg;
     list.appendChild(empty);
     return;
   }
 
   shown.forEach(item => {
-    const box = document.createElement("div");
-    box.className = "expense";
-
-    const info = document.createElement("div");
-    info.className = "expense-info";
-
-    const name = document.createElement("b");
-    name.textContent = item.name;
-
-    const details = document.createElement("small");
-    details.textContent =
-      item.category + " | " + item.date;
-
+    const box = document.createElement("div"); box.className = "expense";
+    const info = document.createElement("div"); info.className = "expense-info";
+    const name = document.createElement("b"); name.textContent = item.name;
+    const details = document.createElement("small"); details.textContent = item.category + " | " + item.date;
     info.append(name, details);
-
     const right = document.createElement("div");
-
-    const amount = document.createElement("strong");
-    amount.textContent =
-      formatMoney(item.amount) + " ج.م";
-
-    const del = document.createElement("button");
-    del.className = "delete";
-    del.textContent = "حذف";
-
+    const amount = document.createElement("strong"); amount.textContent = formatMoney(item.amount) + " " + translations[currentLang].currency_short;
+    const del = document.createElement("button"); del.className = "delete"; del.textContent = translations[currentLang].delete_btn;
     del.addEventListener("click", () => {
-      if (!confirm("متأكد إنك عايز تحذف المصروف؟")) {
-        return;
-      }
-
-      expenses = expenses.filter(
-        expense => expense.id !== item.id
-      );
-
+      if (!confirm(translations[currentLang].confirm_del)) return;
+      expenses = expenses.filter(expense => expense.id !== item.id);
       if (saveData()) render();
     });
-
-    right.append(amount, del);
-    box.append(info, right);
-    list.appendChild(box);
+    right.append(amount, del); box.append(info, right); list.appendChild(box);
   });
 }
 
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById(item.getAttribute('data-page')).classList.add('active');
+  });
+});
+
+let pressTimer;
+document.querySelectorAll('.nav-item').forEach(btn => {
+  const startPress = () => { pressTimer = setTimeout(() => { document.body.classList.add('ios-blurred'); }, 400); };
+  const cancelPress = () => { clearTimeout(pressTimer); document.body.classList.remove('ios-blurred'); };
+  btn.addEventListener('touchstart', startPress);
+  btn.addEventListener('touchend', cancelPress);
+  btn.addEventListener('mousedown', startPress);
+  btn.addEventListener('mouseup', cancelPress);
+  btn.addEventListener('mouseleave', cancelPress);
+});
+
+const nav = document.getElementById('draggableNav');
+let isDragging = false, startX, startY;
+const startDrag = (e) => {
+  isDragging = true; nav.classList.add('dragging');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const rect = nav.getBoundingClientRect();
+  startX = clientX - rect.left; startY = clientY - rect.top;
+};
+const doDrag = (e) => {
+  if (!isDragging) return;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  nav.style.left = `${clientX - startX}px`;
+  nav.style.top = `${clientY - startY}px`;
+  nav.style.bottom = 'auto'; nav.style.transform = 'none';
+};
+const stopDrag = () => {
+  if (!isDragging) return;
+  isDragging = false; nav.classList.remove('dragging');
+  nav.style.left = '50%'; nav.style.top = 'auto'; nav.style.bottom = '20px';
+  nav.style.transform = 'translateX(-50%)';
+};
+nav.addEventListener('mousedown', startDrag);
+document.addEventListener('mousemove', doDrag);
+document.addEventListener('mouseup', stopDrag);
+nav.addEventListener('touchstart', startDrag);
+document.addEventListener('touchmove', doDrag);
+document.addEventListener('touchend', stopDrag);
+
+const bgSelect = document.getElementById('bgSelect');
+bgSelect.addEventListener('change', (e) => { applyBackground(e.target.value); saveSettings(); });
+
+function applyBackground(val) {
+  if (val === 'default') {
+    document.body.style.background = '#101827';
+    document.body.classList.remove('glass-mode');
+  } else {
+    document.body.classList.add('glass-mode');
+    if (val === 'gradient1') document.body.style.background = 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)';
+    else if (val === 'gradient2') document.body.style.background = 'linear-gradient(135deg, #12002b, #32004a, #0f0c29)';
+    else if (val === 'img1') document.body.style.background = "url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80') center/cover fixed";
+    else if (val === 'img2') document.body.style.background = "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80') center/cover fixed";
+  }
+}
+
+// --- [مكان البحث]: كود JavaScript الخاص برفع صورة الملف الشخصي والخلفية المخصصة من المعرض ---
+
+// 1. تغيير الصورة الشخصية من المعرض وحفظها محلياً
+const customAvatarInput = document.getElementById('customAvatarInput');
+const avatarImg = document.getElementById('avatarImg');
+const avatarEmoji = document.getElementById('avatarEmoji');
+
+customAvatarInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64Image = event.target.result;
+      avatarImg.src = base64Image;
+      avatarImg.style.display = 'block';
+      avatarEmoji.style.display = 'none';
+      localStorage.setItem('masrofaty_avatar', base64Image);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+const savedAvatar = localStorage.getItem('masrofaty_avatar');
+if (savedAvatar) {
+  avatarImg.src = savedAvatar;
+  avatarImg.style.display = 'block';
+  avatarEmoji.style.display = 'none';
+}
+
+// 2. رفع خلفية مخصصة من المعرض وحفظها محلياً
+const customBgInput = document.getElementById('customBgInput');
+customBgInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64Bg = event.target.result;
+      document.body.classList.add('glass-mode');
+      document.body.style.background = `url('${base64Bg}') center/cover fixed`;
+      localStorage.setItem('masrofaty_custom_bg', base64Bg);
+      saveSettings();
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+const langSelect = document.getElementById('langSelect');
+langSelect.addEventListener('change', (e) => { currentLang = e.target.value; applyLanguage(currentLang); saveSettings(); });
+
+function applyLanguage(lang) {
+  document.getElementById('htmlTag').dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('htmlTag').lang = lang;
+  document.querySelectorAll('[data-lang]').forEach(el => {
+    const key = el.getAttribute('data-lang');
+    if (translations[lang][key]) el.textContent = translations[lang][key];
+  });
+  render();
+}
+
+function saveSettings() {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ bg: bgSelect.value, lang: langSelect.value }));
+}
+
+function loadSettings() {
+  try {
+    const saved = localStorage.getItem(SETTINGS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.bg) { bgSelect.value = parsed.bg; applyBackground(parsed.bg); }
+      if (parsed.lang) { langSelect.value = parsed.lang; currentLang = parsed.lang; applyLanguage(parsed.lang); }
+    }
+    // استرجاع الخلفية المخصصة من المعرض إن وجدت
+    const savedCustomBg = localStorage.getItem('masrofaty_custom_bg');
+    if (savedCustomBg && bgSelect.value.startsWith('img')) {
+      document.body.classList.add('glass-mode');
+      document.body.style.background = `url('${savedCustomBg}') center/cover fixed`;
+    }
+  } catch (e) {}
+}
+
+const form = document.getElementById("expenseForm");
 form.addEventListener("submit", function(event) {
   event.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const amount = Number(document.getElementById("amount").value);
+  const category = document.getElementById("category").value;
+  const date = document.getElementById("date").value;
 
-  const name = nameInput.value.trim();
-  const amount = Number(amountInput.value);
-  const category = categoryInput.value;
-  const date = dateInput.value;
+  if (!name || !Number.isFinite(amount) || amount <= 0 || !date) { alert("راجع بيانات المصروف."); return; }
 
-  if (
-    !name ||
-    !Number.isFinite(amount) ||
-    amount <= 0 ||
-    !date
-  ) {
-    alert("راجع بيانات المصروف.");
-    return;
-  }
-
-  const expense = {
-    id: Date.now() + Math.random(),
-    name: name,
-    amount: amount,
-    category: category,
-    date: date
-  };
-
+  const expense = { id: Date.now() + Math.random(), name, amount, category, date };
   expenses.push(expense);
-
-  if (!saveData()) {
-    expenses.pop();
-    return;
-  }
-
-  form.reset();
-  dateInput.value = today();
-
+  if (!saveData()) { expenses.pop(); return; }
+  form.reset(); document.getElementById("date").value = today();
   render();
 });
 
-document.getElementById("filter")
-  .addEventListener("change", render);
-
+document.getElementById("filter").addEventListener("change", render);
+loadSettings();
 render();
 </script>
 </body>
