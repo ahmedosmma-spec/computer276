@@ -2,7 +2,7 @@
  "name": "WAZN — وزن",
  "short_name": "WAZN",
  "description": "YOUR MONEY. YOUR BALANCE.",
- "start_url": "./WAZN.html",
+ "start_url": "./",
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
@@ -29,5 +29,10 @@
    "type": "image/png",
    "purpose": "maskable"
   }
+ ],
+ "id": "/",
+ "categories": [
+  "finance",
+  "productivity"
  ]
 }
