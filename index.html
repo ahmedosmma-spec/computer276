@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WAZN — وزن</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#101827">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800&family=Changa:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Inter:wght@400;500;700;800&family=Lato:wght@400;700;900&family=Lateef:wght@400;700&family=Manrope:wght@400;500;700;800&family=Montserrat:wght@400;500;700;800&family=Noto+Sans+Arabic:wght@400;500;700;800&family=Nunito:wght@400;600;800&family=Open+Sans:wght@400;600;700;800&family=Poppins:wght@400;500;700;800&family=Readex+Pro:wght@400;500;700&family=Reem+Kufi:wght@400;600;700&family=Roboto:wght@400;500;700;900&family=Source+Sans+3:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -684,6 +690,7 @@ body.desktop-site #page-more>.card{margin:0!important;min-width:0}
     <div class="card"><h2>🎨 الثيمات الجديدة</h2><p class="converter-note">اختار ألوان وشكل يناسبك. الاختيار بيتحفظ على الجهاز، وكرة محاسبي — لو موجودة في نسختك — بتاخد لون الثيم تلقائيًا.</p><label for="themePreset">الثيم</label><select id="themePreset"><option value="forest">🌿 الأخضر</option><option value="fire">🔥 الناري</option><option value="sakura">🌸 الساكورا</option><option value="islamic">☪️ الإسلامي</option><option value="egyptian">🏺 المصري القديم</option><option value="black-sand">◼️ رمال سوداء</option></select><div class="theme-preview-row" aria-label="معاينة ألوان الثيم"><span style="background:#69e0b1"></span><span style="background:#b56bff"></span><span style="background:#25d9d0"></span><span style="background:#ff9b62"></span><span style="background:#e8bd55"></span></div></div>
 <div class="card"><h2>🌗 المظهر</h2><p class="converter-note">بدّل بين المظهر الداكن والفاتح، واختيارك هيتحفظ على الجهاز ده.</p><button type="button" id="toggleTheme">🌗 تبديل بين الداكن والأبيض</button></div>
     <div class="card"><h2>🗂️ نسخة احتياطية</h2><p class="converter-note">نزّل نسخة من بياناتك أو استورد نسخة قديمة. خزن الملف في مكان آمن.</p><div class="report-controls"><button type="button" id="exportBackup">📤 تصدير البيانات JSON</button><button type="button" id="exportCsv">📊 تنزيل المصروفات CSV</button><button type="button" id="importBackupBtn">📥 استيراد نسخة</button><input type="file" id="importBackupFile" accept=".json,application/json" hidden></div></div>
+  <div class="card" id="waznInstallCard" style="text-align:center"><img src="icon-192.png" alt="شعار WAZN" width="96" height="96" style="width:96px;height:96px;border-radius:22px;display:block;margin:0 auto 10px;box-shadow:0 6px 20px rgba(0,0,0,.35)"><h3 style="margin:6px 0 10px">📲 تحميل تطبيق WAZN</h3><p class="converter-note">نزّل وَزْن على موبايلك كتطبيق بأيقونته الخاصة، يفتح بملء الشاشة ويشتغل بدون شريط المتصفح.</p><button type="button" id="waznInstallBtn">⬇️ تحميل التطبيق</button><p id="waznInstallMsg" class="converter-note" aria-live="polite"></p></div>
   <div class="site-credit">حقوق سيف و احمد (الدعوه الاسلاميه) 2026<span class="version">الإصدار 1.17.1.72</span></div>
   </div>
 
@@ -2986,6 +2993,28 @@ body.light-mode .wazn-wordmark .wm-ar,body.light-mode .wazn-wordmark .wm-en{back
    setTimeout(()=>{try{window.WAZNNavigate&&window.WAZNNavigate('page-settings')}catch(_){}setOpen(true);toast('اتبدّل الحساب')},350);
   }
  }catch(_){}
+})();
+</script>
+<script id="wazn-install-v173">
+(function(){
+ 'use strict';
+ const APK_URL='WAZN.apk'; // ارفع ملف الـ APK بنفس الاسم جنب WAZN.html
+ const btn=document.getElementById('waznInstallBtn'),msg=document.getElementById('waznInstallMsg');
+ if(!btn)return;
+ let deferred=null;
+ const say=t=>{msg.textContent=t};
+ const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e});
+ window.addEventListener('appinstalled',()=>{deferred=null;say('✅ التطبيق اتثبت على جهازك.')});
+ if(standalone()){btn.disabled=true;btn.textContent='✅ التطبيق مثبت';say('إنت فاتح وَزْن كتطبيق بالفعل.')}
+ async function hasApk(){try{const r=await fetch(APK_URL,{method:'HEAD',cache:'no-store'});return r.ok}catch(_){return false}}
+ btn.addEventListener('click',async()=>{
+  if(await hasApk()){const a=document.createElement('a');a.href=APK_URL;a.download='WAZN.apk';document.body.appendChild(a);a.click();a.remove();say('⬇️ بدأ تحميل ملف APK. بعد ما يخلص افتحه من الإشعارات أو من «التنزيلات»، وفعّل «التثبيت من مصادر غير معروفة» لو الموبايل طلب كده.');return}
+  if(deferred){deferred.prompt();try{const c=await deferred.userChoice;say(c.outcome==='accepted'?'✅ جاري تثبيت التطبيق…':'اتلغى التثبيت. تقدر تحاول تاني في أي وقت.')}catch(_){}deferred=null;return}
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  say(ios?'على الآيفون: اضغط زر المشاركة ⬆️ في Safari ثم «إضافة إلى الشاشة الرئيسية».':'افتح قائمة المتصفح ⋮ واختار «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». (لو الخيار مش ظاهر: لازم الموقع يتفتح من رابط https في Chrome، مش من ملف على الموبايل.)');
+ });
 })();
 </script>
 </body>
